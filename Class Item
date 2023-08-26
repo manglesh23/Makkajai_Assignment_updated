@@ -1,0 +1,56 @@
+import java.math.BigDecimal;
+
+ class Item {
+    private int quantity;
+    private String description;
+    private BigDecimal price;
+    private boolean isImported;
+
+    public Item(int quantity, String description, BigDecimal price, boolean isImported) {
+        this.quantity = quantity;
+        this.description = description;
+        this.price = price;
+        this.isImported = isImported;
+    }
+
+    public static Item parse(String input) {
+        String[] parts = input.split(" at ");
+        if (parts.length == 2) {
+            String[] itemInfo = parts[0].split("\\s+");
+            if (itemInfo.length >=  2) {
+                int quantity = Integer.parseInt(itemInfo[0]);
+                boolean isImported = input.contains("imported");
+                String description = input.substring(input.indexOf(itemInfo[1]), input.indexOf(" at "));
+                BigDecimal price = new BigDecimal(parts[1]);
+
+                return new Item(quantity, description, price, isImported);
+            }
+        }
+        throw new IllegalArgumentException("Invalid input format: " + input);
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public boolean isImported() {
+        return isImported;
+    }
+
+    public boolean isExempted() {
+        return description.toLowerCase().contains("book") ||
+                description.toLowerCase().contains("food") ||
+                description.toLowerCase().contains("medicine")||
+                description.toLowerCase().contains("pills")||
+                description.toLowerCase().contains("chocolates")||
+                description.toLowerCase().contains("chocolate");
+    }
+}
