@@ -1,0 +1,48 @@
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+
+ class TaxCalculator {
+    public void calculateAndPrintReceipt(Item item) {
+        BigDecimal salesTax = calculateSalesTax(item);
+        BigDecimal finalPrice = item.getPrice().add(salesTax);
+
+        System.out.println(item.getQuantity() + " " + item.getDescription() + ": " + finalPrice);
+    }
+
+    public BigDecimal calculateSalesTax(Item item) {
+        BigDecimal basicSalesTaxRate = item.isExempted() ? BigDecimal.ZERO : new BigDecimal("0.10");
+        BigDecimal importDutyRate = item.isImported() ? BigDecimal.valueOf(0.05) : BigDecimal.ZERO;
+
+        BigDecimal basicSalesTax = item.getPrice().multiply(basicSalesTaxRate);
+        basicSalesTax = roundToNearestFiveCents(basicSalesTax);
+        BigDecimal importDuty = item.getPrice().multiply(importDutyRate);
+        importDuty = roundToNearestFiveCents(importDuty);
+
+        return basicSalesTax.add(importDuty);
+    }
+
+    public BigDecimal calculateTotalSalesTaxes(List<Item> items) {
+        BigDecimal totalSalesTaxes = BigDecimal.ZERO;
+        for (Item item : items) {
+            BigDecimal salesTax = calculateSalesTax(item);
+            totalSalesTaxes = totalSalesTaxes.add(salesTax);
+        }
+        return totalSalesTaxes;
+    }
+
+    public BigDecimal calculateTotalAmount(List<Item> items) {
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        for (Item item : items) {
+            BigDecimal salesTax = calculateSalesTax(item);
+            BigDecimal finalPrice = item.getPrice().add(salesTax);
+            totalAmount = totalAmount.add(finalPrice);
+        }
+        return totalAmount;
+    }
+
+    private BigDecimal roundToNearestFiveCents(BigDecimal value) {
+        BigDecimal nearest = value.divide(new BigDecimal("0.05"), 0, RoundingMode.UP);
+        return nearest.multiply(new BigDecimal("0.05"));
+    }
+}
